@@ -1,0 +1,156 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model address {
+  address_id   Int       @id @default(autoincrement())
+  full_address String
+  user_id      Int
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @db.Timestamp(6)
+  user         user      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+  order        order[]
+}
+
+model cart {
+  user_id    Int
+  food_id    Int
+  quantity   Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  food       food      @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_food_cart")
+  user       user      @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_cart")
+
+  @@id([user_id, food_id])
+}
+
+model food {
+  food_id    Int          @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  price      Int
+  image      String?      @db.VarChar(255)
+  store_id   Int
+  tags       String[]     @default([]) @db.VarChar(50)
+  created_at DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at DateTime?    @db.Timestamp(6)
+  cart       cart[]
+  store      store        @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_store")
+  menu_food  menu_food[]
+  order_food order_food[]
+}
+
+model menu {
+  menu_id    Int         @id @default(autoincrement())
+  name       String      @db.VarChar(255)
+  image      String?     @db.VarChar(255)
+  created_at DateTime?   @default(now()) @db.Timestamp(6)
+  updated_at DateTime?   @db.Timestamp(6)
+  menu_food  menu_food[]
+}
+
+model menu_food {
+  menu_id    Int
+  food_id    Int
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  food       food      @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_food")
+  menu       menu      @relation(fields: [menu_id], references: [menu_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_menu")
+
+  @@id([menu_id, food_id])
+}
+
+model order {
+  order_id         Int               @id @default(autoincrement())
+  address_id       Int
+  user_id          Int
+  voucher_id       Int?
+  partner_id       Int?
+  message          String?
+  payment_method   String?           @db.VarChar(50)
+  status           String?           @db.VarChar(50)
+  created_at       DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?         @db.Timestamp(6)
+  address          address           @relation(fields: [address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_order")
+  shipping_partner shipping_partner? @relation(fields: [partner_id], references: [partner_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_partner_order")
+  user             user              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_order")
+  voucher          voucher?          @relation(fields: [voucher_id], references: [voucher_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_voucher_order")
+  order_food       order_food[]
+}
+
+model order_food {
+  order_id               Int
+  food_id                Int
+  quantity               Int
+  price_at_time_of_order Decimal   @db.Decimal(10, 2)
+  created_at             DateTime? @default(now()) @db.Timestamp(6)
+  updated_at             DateTime? @db.Timestamp(6)
+  food                   food      @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_food_order")
+  order                  order     @relation(fields: [order_id], references: [order_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_order")
+
+  @@id([order_id, food_id])
+}
+
+model shipping_partner {
+  partner_id     Int       @id @default(autoincrement())
+  partner_name   String    @db.VarChar(255)
+  service_fee    Decimal   @db.Decimal(5, 2)
+  shipping_name  String    @db.VarChar(255)
+  shipping_price Int
+  shipping_time  String?   @db.VarChar(100)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @db.Timestamp(6)
+  order          order[]
+  store          store[]
+}
+
+model store {
+  store_id         Int              @id @default(autoincrement())
+  address          String
+  name             String           @db.VarChar(255)
+  open_hour        DateTime?        @db.Time(6)
+  close_hour       DateTime?        @db.Time(6)
+  price_range      String?          @db.VarChar(50)
+  rating           Decimal?         @db.Decimal(3, 2)
+  total_rating     Int?
+  partner_id       Int
+  created_at       DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?        @db.Timestamp(6)
+  food             food[]
+  shipping_partner shipping_partner @relation(fields: [partner_id], references: [partner_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_partner")
+}
+
+model user {
+  user_id    Int       @id @default(autoincrement())
+  first_name String?   @db.VarChar(255)
+  last_name  String?   @db.VarChar(255)
+  email      String    @unique @db.VarChar(255)
+  phone      String?   @db.VarChar(20)
+  password   String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  address    address[]
+  cart       cart[]
+  order      order[]
+}
+
+model voucher {
+  voucher_id Int       @id @default(autoincrement())
+  percentage Decimal   @db.Decimal(5, 2)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  order      order[]
+}
+
+model banner {
+  banner_id  Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  image      String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+}
