@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { FOOD_TAGS } from 'src/constants/food';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { filterPageAndPageSize } from 'src/utils/common';
-import { FoodRequest, TodayFood } from 'src/validation/food';
+import { Food, FoodRequest, TodayFood } from 'src/validation/food';
 
 @Injectable()
 export class FoodService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  getFood(foodFilter: FoodRequest) {
+  getFood(foodFilter: FoodRequest): Promise<Food[]> {
     const takeSkip = filterPageAndPageSize(
       foodFilter.page,
       foodFilter.pageSize,

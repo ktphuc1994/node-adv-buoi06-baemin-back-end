@@ -31,18 +31,19 @@ model cart {
 }
 
 model food {
-  food_id    Int          @id @default(autoincrement())
-  name       String       @db.VarChar(255)
-  price      Int
-  image      String?      @db.VarChar(255)
-  store_id   Int
-  tags       String[]     @default([]) @db.VarChar(50)
-  created_at DateTime?    @default(now()) @db.Timestamp(6)
-  updated_at DateTime?    @db.Timestamp(6)
-  cart       cart[]
-  store      store        @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_store")
-  menu_food  menu_food[]
-  order_food order_food[]
+  food_id     Int          @id @default(autoincrement())
+  name        String       @db.VarChar(255)
+  price       Int
+  description String?      @db.VarChar(255)
+  image       String?      @db.VarChar(255)
+  store_id    Int
+  tags        String[]     @default([]) @db.VarChar(50)
+  created_at  DateTime?    @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?    @db.Timestamp(6)
+  cart        cart[]
+  store       store        @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_store")
+  menu_food   menu_food[]
+  order_food  order_food[]
 }
 
 model menu {
@@ -113,6 +114,7 @@ model store {
   store_id         Int              @id @default(autoincrement())
   address          String
   name             String           @db.VarChar(255)
+  image            String?          @db.VarChar(255)
   open_hour        DateTime?        @db.Time(6)
   close_hour       DateTime?        @db.Time(6)
   price_range      String?          @db.VarChar(50)
