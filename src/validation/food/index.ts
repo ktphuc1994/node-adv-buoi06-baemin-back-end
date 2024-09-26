@@ -15,6 +15,7 @@ const todayFoodSchema = z.object({
   image: z.string().optional(),
   store_name: z.string(),
   store_address: z.string(),
+  store_id: z.number(),
 });
 
 const foodSchema = todayFoodSchema

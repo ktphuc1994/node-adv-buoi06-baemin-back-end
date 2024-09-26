@@ -34,7 +34,8 @@ export class FoodService {
     food.name,
     food.image,
     store.name AS store_name,
-    store.address AS store_address
+    store.address AS store_address,
+    store.store_id As store_id
     FROM food
     JOIN store ON food.store_id = store.store_id
     WHERE ${FOOD_TAGS.TODAY} = ANY(food.tags);
