@@ -12,7 +12,7 @@ const foodRequestSchema = z.object({
 const todayFoodSchema = z.object({
   food_id: z.number(),
   name: z.string(),
-  image: z.string().nullable(),
+  image: z.string().nullable().optional(),
   store_name: z.string(),
   store_address: z.string(),
   store_id: z.number(),
@@ -22,7 +22,7 @@ const foodSchema = todayFoodSchema
   .omit({ store_name: true, store_address: true })
   .extend({
     price: z.number(),
-    description: z.string().nullable(),
+    description: z.string().nullable().optional(),
     store_id: z.number(),
     tags: z.string().array(),
   });
