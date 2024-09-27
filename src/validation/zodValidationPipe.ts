@@ -3,7 +3,6 @@ import {
   ArgumentMetadata,
   BadRequestException,
 } from '@nestjs/common';
-import { INVALID_FIELD } from 'src/constants/common';
 import { ZodError, ZodSchema } from 'zod';
 
 export class ZodValidationPipe implements PipeTransform {
@@ -18,13 +17,9 @@ export class ZodValidationPipe implements PipeTransform {
         throw new BadRequestException('Validation failed');
 
       let errorMessage = error.errors[0].message;
-      if (error.errors[0].message.includes(INVALID_FIELD))
-        errorMessage = errorMessage.replace(
-          INVALID_FIELD,
-          error.errors[0].path.at(-1)?.toString() ?? INVALID_FIELD,
-        );
+      const errorPath = error.errors[0].path.join('/');
 
-      throw new BadRequestException(errorMessage);
+      throw new BadRequestException(`${errorPath} ${errorMessage}`);
     }
   }
 }
