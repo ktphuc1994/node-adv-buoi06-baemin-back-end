@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UsePipes } from '@nestjs/common';
 import { FoodService } from './food.service';
-import { ZodValidationPipe } from 'src/validation/zodValidationPipe';
 import { Food, FoodRequest, foodRequestSchema } from 'src/validation/food';
+import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 
 @Controller('food')
 export class FoodController {
