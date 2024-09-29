@@ -1,6 +1,5 @@
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ZodValidationPipe } from 'src/validation/zodValidationPipe';
 import {
   CreateUserRequest,
   createUserRequestSchema,
@@ -8,6 +7,7 @@ import {
   loginRequestSchema,
 } from 'src/validation/user/schema';
 import { AccessToken } from 'src/types/auth';
+import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 
 @Controller('auth')
 export class AuthController {
