@@ -10,6 +10,8 @@ import { StoreModule } from './services/store/store.module';
 import { UserModule } from './services/user/user.module';
 import { CartModule } from './services/cart/cart.module';
 import { AuthModule } from './services/auth/auth.module';
+import { OrderModule } from './services/order/order.module';
+import { VoucherModule } from './services/voucher/voucher.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { AuthModule } from './services/auth/auth.module';
     AuthModule,
     UserModule,
     CartModule,
+    OrderModule,
+    VoucherModule,
   ],
   controllers: [AppController],
   providers: [AppService],

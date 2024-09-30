@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
+  Address,
   CreateUserRequest,
   createUserRequestSchema,
 } from 'src/validation/user/schema';
@@ -18,5 +19,11 @@ export class UserService {
   createUser(userInfo: CreateUserRequest) {
     createUserRequestSchema.parse(userInfo);
     return this.prismaService.user.create({ data: userInfo });
+  }
+
+  getUserAddresses(user_id: number): Promise<Address[]> {
+    return this.prismaService.address.findMany({
+      where: { user_id },
+    });
   }
 }

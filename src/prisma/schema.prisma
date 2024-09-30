@@ -67,22 +67,24 @@ model menu_food {
 }
 
 model order {
-  order_id         Int               @id @default(autoincrement())
-  address_id       Int
-  user_id          Int
-  voucher_id       Int?
-  partner_id       Int?
-  message          String?
-  payment_method   String?           @db.VarChar(50)
-  total_discount   Int?              @default(0)
-  status           String?           @db.VarChar(50)
-  created_at       DateTime?         @default(now()) @db.Timestamp(6)
-  updated_at       DateTime?         @db.Timestamp(6)
-  address          address           @relation(fields: [address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_order")
-  shipping_partner shipping_partner? @relation(fields: [partner_id], references: [partner_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_partner_order")
-  user             user              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_order")
-  voucher          voucher?          @relation(fields: [voucher_id], references: [voucher_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_voucher_order")
-  order_food       order_food[]
+  order_id        Int             @id @default(autoincrement())
+  address_id      Int
+  user_id         Int
+  voucher_id      Int?
+  store_id        Int
+  method_id       Int
+  message         String?
+  payment_method  String?         @db.VarChar(50)
+  total_discount  Int?            @default(0)
+  status          String          @db.VarChar(50)
+  created_at      DateTime?       @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?       @db.Timestamp(6)
+  address         address         @relation(fields: [address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_order")
+  shipping_method shipping_method @relation(fields: [method_id], references: [method_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_method_order")
+  store           store           @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_store_order")
+  user            user            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_order")
+  voucher         voucher?        @relation(fields: [voucher_id], references: [voucher_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_voucher_order")
+  order_food      order_food[]
 }
 
 model order_food {
@@ -99,16 +101,13 @@ model order_food {
 }
 
 model shipping_partner {
-  partner_id     Int       @id @default(autoincrement())
-  partner_name   String    @db.VarChar(255)
-  service_fee    Decimal   @db.Decimal(5, 2)
-  shipping_name  String    @db.VarChar(255)
-  shipping_price Int
-  shipping_time  String?   @db.VarChar(100)
-  created_at     DateTime? @default(now()) @db.Timestamp(6)
-  updated_at     DateTime? @db.Timestamp(6)
-  order          order[]
-  store          store[]
+  partner_id              Int                       @id @default(autoincrement())
+  partner_name            String                    @db.VarChar(255)
+  service_fee             Decimal                   @db.Decimal(5, 2)
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?                 @db.Timestamp(6)
+  shipping_partner_method shipping_partner_method[]
+  store                   store[]
 }
 
 model store {
@@ -125,6 +124,7 @@ model store {
   created_at       DateTime?        @default(now()) @db.Timestamp(6)
   updated_at       DateTime?        @db.Timestamp(6)
   food             food[]
+  order            order[]
   shipping_partner shipping_partner @relation(fields: [partner_id], references: [partner_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_partner")
 }
 
@@ -156,4 +156,26 @@ model banner {
   image      String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.Timestamp(6)
   updated_at DateTime? @db.Timestamp(6)
+}
+
+model shipping_method {
+  method_id               Int                       @id @default(autoincrement())
+  shipping_name           String                    @db.VarChar(255)
+  shipping_price          Int
+  shipping_time           String                    @db.VarChar(100)
+  created_at              DateTime?                 @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?                 @db.Timestamp(6)
+  order                   order[]
+  shipping_partner_method shipping_partner_method[]
+}
+
+model shipping_partner_method {
+  partner_id       Int
+  method_id        Int
+  created_at       DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?        @db.Timestamp(6)
+  shipping_method  shipping_method  @relation(fields: [method_id], references: [method_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_method_partner_relation")
+  shipping_partner shipping_partner @relation(fields: [partner_id], references: [partner_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_partner_method_relation")
+
+  @@id([partner_id, method_id])
 }
