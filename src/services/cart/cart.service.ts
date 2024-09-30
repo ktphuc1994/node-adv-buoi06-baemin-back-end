@@ -3,6 +3,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { prismaErrorCodes } from 'src/constants/prisma';
 import { UnprocessableContentException } from 'src/exceptions/UnprocessableContent.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { checkIsArrayDuplicated } from 'src/utils/common';
 import { AddCartRequest, UpdateCartRequest } from 'src/validation/cart/schema';
 
 @Injectable()
@@ -97,5 +98,24 @@ export class CartService {
         'Không thể xóa món ăn. Món ăn không tồn tại trong giỏ hàng.',
       );
     }
+  }
+
+  async validateCartItems(user_id: number, foodIds: number[]) {
+    if (checkIsArrayDuplicated(foodIds))
+      throw new BadRequestException('Món ăn bị trùng.');
+
+    const cartFoodList = await this.prismaService.cart.findMany({
+      where: { user_id, food_id: { in: foodIds } },
+      select: {
+        food_id: true,
+        quantity: true,
+        food: {
+          select: { name: true, price: true, image: true, description: true },
+        },
+      },
+    });
+
+    if (cartFoodList.length !== foodIds.length) return null;
+    return cartFoodList;
   }
 }

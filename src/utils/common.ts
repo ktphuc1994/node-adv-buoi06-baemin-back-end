@@ -7,4 +7,14 @@ const filterPageAndPageSize = (
   return { take: pageSize, skip: (page - 1) * pageSize };
 };
 
-export { filterPageAndPageSize };
+const checkIsArrayDuplicated = (arrayToCheck: number[] | string[]): boolean => {
+  const checkedObject: Record<string | number, true> = {};
+  for (let item of arrayToCheck) {
+    if (checkedObject[item]) return true;
+    checkedObject[item] = true;
+  }
+
+  return false;
+};
+
+export { filterPageAndPageSize, checkIsArrayDuplicated };
