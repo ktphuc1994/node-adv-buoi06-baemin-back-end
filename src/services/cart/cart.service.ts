@@ -5,10 +5,14 @@ import { UnprocessableContentException } from 'src/exceptions/UnprocessableConte
 import { PrismaService } from 'src/prisma/prisma.service';
 import { checkIsArrayDuplicated } from 'src/utils/common';
 import { AddCartRequest, UpdateCartRequest } from 'src/validation/cart/schema';
+import { FoodService } from '../food/food.service';
 
 @Injectable()
 export class CartService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private foodService: FoodService,
+  ) {}
 
   async getCart(user_id: number) {
     const storeList = await this.prismaService.store.findMany({
@@ -23,6 +27,7 @@ export class CartService {
             name: true,
             description: true,
             price: true,
+            stock: true,
             cart: { where: { user_id }, select: { quantity: true } },
           },
         },
@@ -36,6 +41,7 @@ export class CartService {
         description: foodInfo.description,
         price: foodInfo.price,
         quantity: foodInfo.cart[0].quantity,
+        stock: foodInfo.stock,
       }));
       return { ...store, food: foodList };
     });
@@ -53,10 +59,18 @@ export class CartService {
       where: { user_id, food_id },
     });
 
+    const { stock } = await this.foodService.getFoodDetail(cartInfo.food_id);
+    if (stock === 0) throw new BadRequestException('Món ăn đã hết hàng.');
+
     if (!existItem)
       return this.prismaService.cart.create({
         data: { user_id, food_id, quantity: 1 },
       });
+
+    if (stock <= existItem.quantity)
+      throw new BadRequestException(
+        `Số lượng món được đặt tối đa là ${stock}.`,
+      );
 
     return this.prismaService.cart.update({
       where: { user_id_food_id: { user_id, food_id } },
@@ -66,12 +80,20 @@ export class CartService {
 
   async updateItemInCart(cartInfo: UpdateCartRequest & { user_id: number }) {
     const { user_id, food_id, quantity } = cartInfo;
+
     const existItem = await this.prismaService.cart.findFirst({
       where: { user_id, food_id },
     });
-
     if (!existItem)
       throw new BadRequestException('Món ăn không tồn tại trong giỏ hàng.');
+
+    const { stock } = await this.foodService.getFoodDetail(cartInfo.food_id);
+    if (stock === 0) throw new BadRequestException('Món ăn đã hết hàng.');
+
+    if (stock < cartInfo.quantity)
+      throw new BadRequestException(
+        `Số lượng món được đặt tối đa là ${stock}.`,
+      );
 
     return this.prismaService.cart.update({
       where: { user_id_food_id: { user_id, food_id } },

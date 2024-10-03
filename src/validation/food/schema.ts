@@ -27,14 +27,27 @@ const foodSchema = todayFoodSchema
     tags: z.string().array(),
   });
 
+const checkStockRequestSchema = z.object({
+  food_id: z.number().int(),
+  quantity: z.number().int(),
+});
+const checkStockResponseSchema = checkStockRequestSchema.extend({
+  stock: z.number().int(),
+});
+
 type FoodRequest = z.infer<typeof foodRequestSchema>;
 type TodayFood = z.infer<typeof todayFoodSchema>;
 type Food = z.infer<typeof foodSchema>;
+type CheckStockRequest = z.infer<typeof checkStockRequestSchema>;
+type CheckStockResponse = z.infer<typeof checkStockResponseSchema>;
 
 export {
   todayFoodSchema,
   foodRequestSchema,
+  checkStockRequestSchema,
   type FoodRequest,
   type TodayFood,
   type Food,
+  type CheckStockRequest,
+  type CheckStockResponse,
 };
