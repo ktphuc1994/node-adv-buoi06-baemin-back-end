@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Banner } from 'src/validation/banner';
+import { Banner } from 'src/validation/banner/schema';
 
 @Injectable()
 export class BannerService {

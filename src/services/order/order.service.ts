@@ -7,6 +7,7 @@ import {
 import { CartService } from '../cart/cart.service';
 import { UnprocessableContentException } from 'src/exceptions/UnprocessableContent.exception';
 import { VoucherService } from '../voucher/voucher.service';
+import { FoodService } from '../food/food.service';
 
 @Injectable()
 export class OrderService {
@@ -14,6 +15,7 @@ export class OrderService {
     private prismaService: PrismaService,
     private cartService: CartService,
     private voucherService: VoucherService,
+    private foodService: FoodService,
   ) {}
 
   async validateOrder(store_id: number, foodIds: number[]): Promise<void> {
@@ -34,12 +36,18 @@ export class OrderService {
     foodIds: number[],
   ) {
     await this.validateOrder(store_id, foodIds);
+
+    // check food in card
     const foodList = await this.cartService.validateCartItems(user_id, foodIds);
     if (!foodList)
       throw new BadRequestException('Món ăn không tồn tại trong giỏ hàng.');
 
+    // check stock
+    await this.foodService.checkStock(foodList);
+
     const voucherList = await this.voucherService.getVoucherList();
 
+    // get store information
     const storeInfo = await this.prismaService.store.findFirst({
       where: { store_id },
       select: {
@@ -72,7 +80,7 @@ export class OrderService {
   async placeOrder(orderInfo: CreateOrderRequest & { user_id: number }) {
     const { foodIds, ...createOrderInfo } = orderInfo;
 
-    // check address
+    // kiểm address
     const addressInfo = await this.prismaService.address.findFirst({
       where: {
         address_id: orderInfo.address_id,
@@ -117,6 +125,9 @@ export class OrderService {
         'Phương thức vận chuyển không khả dụng với gian hàng.',
       );
 
+    // kiểm tra stock
+    const foodStock = await this.foodService.checkStock(foodRawList);
+
     // tính total_discount
     let total_discount = 0;
     const discountPercentage = voucherInfo.percentage.toNumber() / 100;
@@ -142,12 +153,20 @@ export class OrderService {
       },
     });
 
+    const updateStockQuery = foodStock.map((stockInfo) =>
+      this.prismaService.food.update({
+        where: { food_id: stockInfo.food_id },
+        data: { stock: stockInfo.stock - stockInfo.quantity },
+      }),
+    );
+
     try {
       const [order] = await this.prismaService.$transaction([
         orderPromise,
         this.prismaService.cart.deleteMany({
           where: { user_id: orderInfo.user_id, food_id: { in: foodIds } },
         }),
+        ...updateStockQuery,
       ]);
 
       return order;

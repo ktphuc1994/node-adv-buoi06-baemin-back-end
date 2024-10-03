@@ -1,6 +1,11 @@
 import { Controller, Get, Query, UsePipes } from '@nestjs/common';
 import { FoodService } from './food.service';
-import { Food, FoodRequest, foodRequestSchema } from 'src/validation/food';
+import {
+  Food,
+  FoodRequest,
+  foodRequestSchema,
+  TodayFood,
+} from 'src/validation/food/schema';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 
 @Controller('food')
@@ -14,7 +19,7 @@ export class FoodController {
   }
 
   @Get('today')
-  getTodayFood() {
+  getTodayFood(): Promise<TodayFood[]> {
     return this.foodService.getTodayFood();
   }
 }
