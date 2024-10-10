@@ -24,7 +24,7 @@ const getInformationByFoodIdsRequestSchema = z.object({
 
 const createOrderRequestSchema = z.object({
   address_id: z.number().int(),
-  voucher_id: z.number().int(),
+  voucher_id: z.number().int().optional(),
   store_id: z.number().int(),
   method_id: z.number().int(),
   foodIds: z.number().int().array(),
@@ -32,10 +32,16 @@ const createOrderRequestSchema = z.object({
   payment_method: paymentTypeSchema,
 });
 
+const updateStatusRequestSchema = z.object({
+  status: orderStatusSchema,
+  order_id: z.number().int(),
+});
+
 type CreateOrderRequest = z.infer<typeof createOrderRequestSchema>;
 type GetInformationByFoodIdsRequest = z.infer<
   typeof getInformationByFoodIdsRequestSchema
 >;
+type UpdateStatusRequest = z.infer<typeof updateStatusRequestSchema>;
 
 export {
   PAYMENT_TYPE,
@@ -44,6 +50,8 @@ export {
   orderStatusSchema,
   getInformationByFoodIdsRequestSchema,
   createOrderRequestSchema,
+  updateStatusRequestSchema,
   type CreateOrderRequest,
   type GetInformationByFoodIdsRequest,
+  type UpdateStatusRequest,
 };

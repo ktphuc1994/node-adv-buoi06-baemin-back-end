@@ -3,6 +3,8 @@ import {
   Body,
   Controller,
   Get,
+  Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -16,9 +18,14 @@ import {
   CreateOrderRequest,
   GetInformationByFoodIdsRequest,
   getInformationByFoodIdsRequestSchema,
+  orderStatusSchema,
+  ORDER_STATUS,
+  updateStatusRequestSchema,
+  UpdateStatusRequest,
 } from 'src/validation/order/schema';
 import { ZodValidationPipe } from 'src/pipes/zodValidation.pipe';
 import { JwtGuard } from 'src/guards/jwt.guard';
+import { EnhancedParseIntPipe } from 'src/pipes/parse-int.pipe';
 
 @UseGuards(JwtGuard)
 @Controller('order')
@@ -61,5 +68,22 @@ export class OrderController {
       ...orderInfo,
       user_id: user.user_id,
     });
+  }
+
+  @Get('detail/:orderId')
+  getOrderDetail(
+    @Req() { user }: UserInReq,
+    @Param('orderId', EnhancedParseIntPipe) orderId: number,
+  ) {
+    return this.orderService.getOrderDetail(orderId, user.user_id);
+  }
+
+  @Patch('update-status')
+  @UsePipes(new ZodValidationPipe(updateStatusRequestSchema))
+  updateOrderStatus(
+    @Req() { user }: UserInReq,
+    @Body() { order_id, status }: UpdateStatusRequest,
+  ) {
+    return this.orderService.updateOrderStatus(order_id, user.user_id, status);
   }
 }

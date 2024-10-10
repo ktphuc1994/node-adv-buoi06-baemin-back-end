@@ -2,12 +2,15 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateOrderRequest,
+  ORDER_STATUS,
   orderStatusSchema,
 } from 'src/validation/order/schema';
 import { CartService } from '../cart/cart.service';
 import { UnprocessableContentException } from 'src/exceptions/UnprocessableContent.exception';
 import { VoucherService } from '../voucher/voucher.service';
 import { FoodService } from '../food/food.service';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { prismaErrorCodes } from 'src/constants/prisma';
 
 @Injectable()
 export class OrderService {
@@ -55,24 +58,37 @@ export class OrderService {
         name: true,
         shipping_partner: {
           select: {
+            service_fee: true,
             shipping_partner_method: { include: { shipping_method: true } },
           },
         },
       },
     });
 
+    if (!storeInfo)
+      throw new BadRequestException(
+        'Của hàng tương ứng với các món ăn không tồn tại.',
+      );
+
     const shippingMethods =
-      storeInfo?.shipping_partner.shipping_partner_method.map(
+      storeInfo.shipping_partner.shipping_partner_method.map(
         (shippingInfo) => shippingInfo.shipping_method,
       );
 
+    const food = foodList.map((foodInfo) => ({
+      ...foodInfo.food,
+      food_id: foodInfo.food_id,
+      quantity: foodInfo.quantity,
+    }));
+
     return {
       store: {
-        store_id: storeInfo?.store_id,
-        name: storeInfo?.name,
+        store_id: storeInfo.store_id,
+        name: storeInfo.name,
+        service_fee: storeInfo.shipping_partner.service_fee.toNumber(),
         shippingMethods,
       },
-      food: foodList,
+      food,
       voucherList,
     };
   }
@@ -93,10 +109,15 @@ export class OrderService {
       );
 
     // kiểm tra voucher
-    const voucherInfo = await this.voucherService.getVoucherById(
-      orderInfo.voucher_id,
-    );
-    if (!voucherInfo) throw new BadRequestException('Voucher không tồn tại.');
+    let discountPercentage = 0;
+    if (orderInfo.voucher_id) {
+      const voucherInfo = await this.voucherService.getVoucherById(
+        orderInfo.voucher_id,
+      );
+      if (!voucherInfo) throw new BadRequestException('Voucher không tồn tại.');
+
+      discountPercentage = voucherInfo.percentage.toNumber() / 100;
+    }
 
     // kiểm tra xem foodIds có trong cart không
     const foodRawList = await this.cartService.validateCartItems(
@@ -118,7 +139,18 @@ export class OrderService {
           },
         },
       },
-      select: { store_id: true },
+      select: {
+        store_id: true,
+        shipping_partner: {
+          select: {
+            service_fee: true,
+            shipping_partner_method: {
+              where: { method_id: orderInfo.method_id },
+              select: { shipping_method: { select: { shipping_price: true } } },
+            },
+          },
+        },
+      },
     });
     if (!storeInfo)
       throw new BadRequestException(
@@ -130,11 +162,12 @@ export class OrderService {
 
     // tính total_discount
     let total_discount = 0;
-    const discountPercentage = voucherInfo.percentage.toNumber() / 100;
-
+    let service_fee = 0;
     const orderFoodData = foodRawList.map((foodInfo) => {
-      total_discount +=
-        foodInfo.food.price * foodInfo.quantity * discountPercentage;
+      const total = foodInfo.food.price * foodInfo.quantity;
+      total_discount += total * discountPercentage;
+      service_fee +=
+        (total * storeInfo.shipping_partner.service_fee.toNumber()) / 100;
 
       return {
         food_id: foodInfo.food_id,
@@ -147,6 +180,10 @@ export class OrderService {
         ...createOrderInfo,
         status: orderStatusSchema.enum.PENDING,
         total_discount: Math.round(total_discount),
+        service_fee: Math.round(service_fee),
+        shipping_price:
+          storeInfo.shipping_partner.shipping_partner_method[0].shipping_method
+            .shipping_price,
         order_food: {
           createMany: { data: orderFoodData },
         },
@@ -169,11 +206,77 @@ export class OrderService {
         ...updateStockQuery,
       ]);
 
-      return order;
+      return { order_id: order.order_id };
     } catch (_error) {
       throw new UnprocessableContentException(
         'Không thể tạo đơn hàng. Vui lòng thử lại sau.',
       );
+    }
+  }
+
+  async getOrderDetail(order_id: number, user_id: number) {
+    const orderInfo = await this.prismaService.order.findFirst({
+      where: { order_id, user_id },
+      select: {
+        status: true,
+        payment_method: true,
+        shipping_price: true,
+        service_fee: true,
+        total_discount: true,
+        user: { select: { first_name: true, last_name: true, phone: true } },
+        address: { select: { full_address: true } },
+        store: { select: { name: true } },
+        order_food: {
+          select: {
+            price_at_time_of_order: true,
+            quantity: true,
+            food: { select: { image: true, name: true, description: true } },
+          },
+        },
+      },
+    });
+
+    if (!orderInfo) throw new BadRequestException('Đơn hàng không tồn tại');
+
+    const food = orderInfo.order_food.map((foodInfo) => ({
+      ...foodInfo.food,
+      quantity: foodInfo.quantity,
+      price: foodInfo.price_at_time_of_order,
+    }));
+
+    return {
+      status: orderInfo.status,
+      payment_method: orderInfo.payment_method,
+      shipping_price: orderInfo.shipping_price,
+      service_fee: orderInfo.service_fee,
+      total_discount: orderInfo.total_discount,
+      user: orderInfo.user,
+      address: orderInfo.address.full_address,
+      store_name: orderInfo.store.name,
+      food,
+    };
+  }
+
+  async updateOrderStatus(
+    order_id: number,
+    user_id: number,
+    status: ORDER_STATUS,
+  ) {
+    try {
+      return await this.prismaService.order.update({
+        where: { order_id, user_id },
+        data: { status },
+      });
+    } catch (error) {
+      if (
+        !(error instanceof PrismaClientKnownRequestError) ||
+        error.code !== prismaErrorCodes.notFound
+      )
+        throw new UnprocessableContentException(
+          'Không thể cập nhật trạng thái đơn hàng. Xin hãy thử lại sau.',
+        );
+
+      throw new BadRequestException('Đơn hàng không tồn tại.');
     }
   }
 }
