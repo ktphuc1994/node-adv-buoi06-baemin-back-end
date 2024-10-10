@@ -5,9 +5,9 @@ export class EnhancedParseIntPipe extends ParseIntPipe {
     try {
       return await super.transform(value, metadata);
     } catch {
-      let errorMessage = 'numeric string is expected';
+      let errorMessage = 'yêu cầu định dạng là số nguyên';
       if (metadata.data) {
-        errorMessage = `${metadata.data} must be a numeric string`;
+        errorMessage = `${metadata.data} phải là số nguyên`;
       }
       throw this.exceptionFactory(errorMessage);
     }

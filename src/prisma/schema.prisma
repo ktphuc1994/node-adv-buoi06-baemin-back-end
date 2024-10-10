@@ -80,6 +80,8 @@ model order {
   status          String          @db.VarChar(50)
   created_at      DateTime?       @default(now()) @db.Timestamp(6)
   updated_at      DateTime?       @db.Timestamp(6)
+  service_fee     Int?            @default(0)
+  shipping_price  Int
   address         address         @relation(fields: [address_id], references: [address_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_address_order")
   shipping_method shipping_method @relation(fields: [method_id], references: [method_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_method_order")
   store           store           @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_store_order")
@@ -92,7 +94,7 @@ model order_food {
   order_id               Int
   food_id                Int
   quantity               Int
-  price_at_time_of_order Decimal   @db.Decimal(10, 2)
+  price_at_time_of_order Int
   created_at             DateTime? @default(now()) @db.Timestamp(6)
   updated_at             DateTime? @db.Timestamp(6)
   food                   food      @relation(fields: [food_id], references: [food_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_food_order")

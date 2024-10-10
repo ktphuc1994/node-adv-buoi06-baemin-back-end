@@ -16,10 +16,13 @@ export class ZodValidationPipe implements PipeTransform {
       if (!(error instanceof ZodError))
         throw new BadRequestException('Validation failed');
 
-      let errorMessage = error.errors[0].message;
-      const errorPath = error.errors[0].path.join('/');
+      let errorMessage = '';
+      error.errors.forEach((zodIssue) => {
+        const issuePath = zodIssue.path.join('.');
+        errorMessage += `'${issuePath}' ${zodIssue.message}. `;
+      });
 
-      throw new BadRequestException(`${errorPath} ${errorMessage}`);
+      throw new BadRequestException(errorMessage);
     }
   }
 }

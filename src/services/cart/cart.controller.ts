@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Req,
@@ -21,6 +20,7 @@ import {
   UpdateCartRequest,
   updateCartRequestSchema,
 } from 'src/validation/cart/schema';
+import { EnhancedParseIntPipe } from 'src/pipes/parse-int.pipe';
 
 @UseGuards(JwtGuard)
 @Controller('cart')
@@ -58,7 +58,7 @@ export class CartController {
   @Delete('remove/:foodId')
   removeCartItem(
     @Req() { user }: UserInReq,
-    @Param('foodId', ParseIntPipe) foodId: number,
+    @Param('foodId', EnhancedParseIntPipe) foodId: number,
   ) {
     return this.cartService.removeCartItem(foodId, user.user_id);
   }
