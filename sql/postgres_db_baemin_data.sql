@@ -1,0 +1,200 @@
+insert into banner (name, image) values
+('Banner 1', '/images/map1.png'),
+('Banner 2', '/images/map2.png'),
+('Banner 3', '/images/map3.png'),
+('Banner 4', '/images/map4.png');
+
+INSERT INTO "user" (first_name, last_name, email, phone, password) VALUES
+('John', 'Doe', 'john.doe@example.com', '1234567890', 'password123'),
+('Jane', 'Smith', 'jane.smith@example.com', '0987654321', 'pass123'),
+('Alice', 'Brown', 'alice.brown@example.com', '9876543210', 'abc123'),
+('Bob', 'Johnson', 'bob.johnson@example.com', '8765432109', 'def456'),
+('Charlie', 'Lee', 'charlie.lee@example.com', '7654321098', 'ghi789'),
+('David', 'Miller', 'david.miller@example.com', '6543210987', 'jkl012'),
+('Emma', 'Wilson', 'emma.wilson@example.com', '5432109876', 'mno345'),
+('Frank', 'Taylor', 'frank.taylor@example.com', '4321098765', 'pqr678'),
+('Grace', 'Anderson', 'grace.anderson@example.com', '3210987654', 'stu901'),
+('Henry', 'Thomas', 'henry.thomas@example.com', '2109876543', 'vwx234'),
+('Thien Phuc', 'Khuc', 'khucthienphuc@gmail.com', '123456789', '$2b$10$2FtL8hIjxbHTZPPEl4K7SuwKfae3gE3/ktBJFQDexd5qEp/nFancS');
+
+
+INSERT INTO shipping_partner (partner_name, service_fee) VALUES
+('FastDeliver', 5.99),
+('ReliableCouriers', 4.99),
+('Rush Logistics', 8.99),
+('Swift Transport', 5.99),
+('Lightning Delivery', 2.00),
+('UltraShip', 7.49);
+
+insert into shipping_method (shipping_price, shipping_name, shipping_time) values
+(30000, 'Standard Shipping', '15-30 minutes'),
+(20000, 'Same-Day Delivery', '12 hours'),
+(50000, 'Rush Delivery', '5 minutes'),
+(40000, 'Express Shipping', '10 minutes');
+
+insert into shipping_partner_method (partner_id, method_id) values
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 1),
+(2, 3),
+(3, 2),
+(3, 4),
+(4, 1),
+(4, 3),
+(4, 4),
+(5, 2),
+(5, 3),
+(5, 4),
+(6, 1),
+(6, 2),
+(6, 3);
+
+
+
+INSERT INTO store (address, name, open_hour, close_hour, price_range, rating, partner_id, total_rating, image) VALUES
+('123 Market St, Cityville', 'Market Diner', '07:00', '22:00', '$$', 4.5, 1, 450, '/food/ga1.jpg'),
+('456 Plaza St, Townsville', 'Plaza Grill', '09:00', '21:00', '$$$', 4.7, 3, 470, '/food/ga1.jpg'),
+('789 Broad St, Metropolis', 'Broadway Eatery', '11:00', '23:00', '$$', 4.6, 4, 460, '/food/ga1.jpg'),
+('101 Central St, Smalltown', 'Central Café', '06:00', '20:00', '$', 4.3, 2, 430, '/food/ga1.jpg'),
+('202 Riverside Dr, Bigcity', 'Riverside BBQ', '10:00', '22:00', '$$', 4.8, 5, 480, '/food/ga1.jpg'),
+('303 Downtown Ave, Villagetown', 'Downtown Pub', '11:00', '02:00', '$$', 4.4, 6, 440, '/images/Ga.png'),
+('404 Main St, Hamletville', 'Main Street Café', '07:00', '18:00', '$', 4.1, 1, 410, '/images/Ga.png'),
+('505 Uptown St, Newburg', 'Uptown Bistro', '08:00', '22:00', '$$$', 4.9, 4, 490, '/images/Ga.png'),
+('606 Suburbia St, Oldtown', 'Suburban Diner', '06:00', '19:00', '$', 4.0, 3, 400, '/images/Ga.png'),
+('707 Metro St, Suburbia', 'Metro Grill', '10:00', '22:00', '$$$', 4.7, 5, 470, '/images/Ga.png');
+
+INSERT INTO food (name, price, store_id, image, tags, description, stock) VALUES
+('Burger', 50000, 1, '/food/ga1.jpg', ARRAY['hot', 'today'], 'A juicy beef burger with lettuce, tomato, and cheese', 5),
+('Pizza', 80000, 2, '/images/Ga.png', ARRAY['feature', 'hot'], 'Delicious pizza with various toppings', 3),
+('Sushi', 120000, 3, '/food/ga1.jpg', ARRAY['home cook'], 'Fresh sushi with a variety of seafood', 20),
+('Pasta', 75000, 4, '/food/ga1.jpg', ARRAY['feature'], 'Classic Italian pasta with tomato sauce', 4),
+('Tacos', 40000, 5, '/food/ga1.jpg', ARRAY['hot', 'home cook'], 'Soft tacos filled with beef and veggies', 6),
+('Fried Chicken', 60000, 6, '/images/Ga.png', ARRAY['today'], 'Crispy fried chicken with a side of fries', 35),
+('Salad', 30000, 7, '/food/ga1.jpg', ARRAY['feature'], 'Healthy green salad with dressing', 45),
+('Sandwich', 45000, 8, '/images/Ga.png', ARRAY['hot'], 'A fresh sandwich with ham, cheese, and veggies', 55),
+('Steak', 150000, 9, '/food/ga1.jpg', ARRAY['home cook'], 'Grilled steak with a side of mashed potatoes', 15),
+('Ice Cream', 20000, 10, '/images/Ga.png', ARRAY['feature'], 'Creamy vanilla ice cream with chocolate topping', 7),
+('Hot Dog', 35000, 1, '/food/ga1.jpg', ARRAY['today'], 'Classic hot dog with mustard and ketchup', 5),
+('Fries', 25000, 2, '/food/ga1.jpg', ARRAY['hot'], 'Golden crispy fries with seasoning', 10),
+('Donuts', 15000, 3, '/food/ga1.jpg', ARRAY['home cook'], 'Sweet donuts with various glazes', 8),
+('Curry', 70000, 4, '/food/ga1.jpg', ARRAY['feature', 'today'], 'Spicy Indian curry with rice', 25),
+('Burrito', 55000, 5, '/food/ga1.jpg', ARRAY['hot', 'home cook'], 'Large burrito stuffed with beans, rice, and meat', 6),
+('Wings', 65000, 6, '/images/Ga.png', ARRAY['feature'], 'Buffalo wings served with blue cheese dip', 30),
+('Soup', 30000, 7, '/food/ga1.jpg', ARRAY['today'], 'Hot vegetable soup with herbs', 1),
+('Panini', 50000, 8, '/images/Ga.png', ARRAY['hot'], 'Grilled panini with mozzarella and basil', 40),
+('BBQ Ribs', 130000, 9, '/food/ga1.jpg', ARRAY['home cook'], 'Smoky BBQ ribs with barbecue sauce', 2),
+('Milkshake', 25000, 10, '/images/Ga.png', ARRAY['feature'], 'Creamy milkshake in vanilla or chocolate flavor', 85),
+('Nachos', 45000, 1, '/food/ga1.jpg', ARRAY['today', 'hot'], 'Crunchy nachos topped with cheese and jalapenos', 5),
+('Pancakes', 40000, 2, '/food/ga1.jpg', ARRAY['feature'], 'Fluffy pancakes with syrup and butter', 6),
+('Spaghetti', 70000, 3, '/food/ga1.jpg', ARRAY['home cook'], 'Spaghetti with marinara sauce and parmesan', 35),
+('Samosa', 30000, 4, '/images/Ga.png', ARRAY['hot', 'feature'], 'Fried samosas stuffed with potatoes and peas', 9),
+('Kebab', 60000, 5, '/images/Ga.png', ARRAY['today'], 'Grilled meat kebabs with vegetables', 1),
+('Falafel', 35000, 6, '/images/Ga.png', ARRAY['home cook'], 'Crispy falafel with hummus and pita', 65),
+('Eggrolls', 20000, 7, '/food/ga1.jpg', ARRAY['feature'], 'Fried egg rolls filled with vegetables', 1),
+('Bagel', 15000, 8, '/images/Ga.png', ARRAY['hot'], 'Fresh bagel with cream cheese', 75),
+('Lobster Roll', 160000, 9, '/food/ga1.jpg', ARRAY['home cook'], 'Lobster roll with fresh lobster meat and butter', 1),
+('Smoothie', 35000, 10, '/images/Ga.png', ARRAY['feature'], 'Fruit smoothie with strawberries and bananas', 9),
+('Grilled Cheese', 40000, 1, '/images/Ga.png', ARRAY['today', 'hot'], 'Grilled cheese sandwich with cheddar', 6),
+('Muffin', 20000, 2, '/images/Ga.png', ARRAY['feature'], 'Blueberry muffin with a crispy top', 85),
+('Ramen', 90000, 3, '/food/ga1.jpg', ARRAY['home cook'], 'Japanese ramen with pork and soft-boiled egg', 25),
+('Quesadilla', 50000, 4, '/images/Ga.png', ARRAY['hot', 'today'], 'Cheesy quesadilla with chicken and salsa', 4),
+('Gyoza', 30000, 5, '/food/ga1.jpg', ARRAY['feature'], 'Fried Japanese dumplings filled with pork', 70),
+('Shrimp Cocktail', 110000, 6, '/images/Ga.png', ARRAY['hot'], 'Chilled shrimp with cocktail sauce', 3),
+('Cheesecake', 45000, 7, '/food/ga1.jpg', ARRAY['home cook'], 'Creamy cheesecake with a graham cracker crust', 35),
+('Ceviche', 85000, 8, '/images/Ga.png', ARRAY['today'], 'Fresh ceviche with fish and lime juice', 45),
+('Brisket', 140000, 9, '/food/ga1.jpg', ARRAY['feature'], 'Smoked brisket with BBQ sauce', 2),
+('Bubble Tea', 30000, 10, '/images/Ga.png', ARRAY['hot', 'feature'], 'Bubble tea with tapioca pearls', 10);
+
+INSERT INTO menu (name, image) VALUES
+('Breakfast Specials', '/images/noddle.png'), 
+('Lunch Combo', '/images/Ga.png'), 
+('Dinner Delights', '/images/noddle.png'),
+('Vegan Menu', '/images/noddle.png'),
+('Seafood Selection', '/images/burger.jpg'),
+('Meat Lovers', '/images/Ga.png'),
+('Kids Menu', '/images/burger.jpg'),
+('Dessert Heaven', '/images/Ga.png'),
+('Healthy Options', '/images/noddle.png'),
+('Chef’s Specials', '/images/burger.jpg');
+
+INSERT INTO menu_food (menu_id, food_id) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 4),
+(2, 5),
+(2, 6),
+(3, 7),
+(3, 8),
+(3, 9),
+(4, 10),
+(4, 11),
+(4, 12),
+(5, 13),
+(5, 14),
+(5, 15),
+(6, 16),
+(6, 17),
+(6, 18),
+(7, 19),
+(7, 20),
+(7, 21),
+(8, 22),
+(8, 23),
+(8, 24),
+(9, 25),
+(9, 26),
+(9, 27),
+(10, 28),
+(10, 29),
+(10, 30),
+(1, 31),
+(2, 32),
+(3, 33),
+(4, 34),
+(5, 35),
+(6, 36),
+(7, 37),
+(8, 38),
+(9, 39),
+(10, 40);
+
+INSERT INTO cart (user_id, food_id, quantity) VALUES
+(1, 1, 2),
+(2, 2, 1),
+(3, 3, 1),
+(4, 4, 3),
+(5, 5, 2),
+(6, 6, 1),
+(7, 7, 2),
+(8, 8, 3),
+(9, 9, 1),
+(10, 10, 2);
+
+INSERT INTO address (full_address, user_id) VALUES
+('123 Main St, Cityville', 1),
+('456 Oak St, Townsville', 2),
+('789 Pine St, Metropolis', 3),
+('101 Maple St, Smalltown', 4),
+('202 Cedar St, Bigcity', 5),
+('303 Birch St, Villagetown', 6),
+('404 Elm St, Hamletville', 7),
+('505 Cherry St, Newburg', 8),
+('606 Willow St, Oldtown', 9),
+('707 Ash St, Suburbia', 10),
+('343 Pham Ngu Lao St, District 1', 11),
+('55 Chu Van An St, Thu Duc City', 11);
+
+INSERT INTO voucher (percentage) VALUES
+(10.50),
+(15.00),
+(20.50),
+(5.00),
+(25.00),
+(30.00),
+(35.00),
+(40.60),
+(45.00),
+(50.00);
+
