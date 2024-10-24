@@ -1,0 +1,15 @@
+services:
+  baemin-backend-nestjs-container:
+    container_name: baemin-backend-nestjs-container
+    build: .
+    image: baemin-backend-nestjs-img
+    ports:
+      - 8080:8080
+    env_file:
+      - .env.server.local
+    networks:
+      - node_network
+
+networks:
+  node_network:
+    external: true
