@@ -16,7 +16,7 @@ jobs:
           script: |
             cd /root/baemin-backend
             git pull
-            docker-compose down
-            docker-compose build
-            docker-compose up -d
-            docker images -f "dangling=true" -q | xargs docker rmi
+            docker compose down
+            docker compose build
+            docker compose up -d
+            docker image prune -f
